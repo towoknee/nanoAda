@@ -2,46 +2,48 @@ import java.util.*;
 
 public class SymbolTable extends Object{
 
-   private int level;
+   //private int level;
    private Stack<Map<String, SymbolEntry>> stack;
-   private Chario chario;
+   /*private Chario chario;
 
    public Boolean scopeBool;
    public Boolean roleBool;
-
-   private static final SymbolEntry EMPTY_SYMBOL = new SymbolEntry("", false, false);
+   */
+   private static final SymbolEntry EMPTY_SYMBOL = new SymbolEntry("");
 
    public SymbolTable(Chario c, Boolean s, Boolean r){
+      /*
       chario = c;
       scopeBool = s;
       roleBool = r;
+      */
       reset();
    }
 
    public void reset(){
-      level = -1;
+      //level = -1;
       stack = new Stack<Map<String, SymbolEntry>>();
    }
 
    public void enterScope(){
       stack.push(new HashMap<String, SymbolEntry>());
-      level++;
+      //level++;
    }
 
    public void exitScope(){
       Map<String, SymbolEntry> table = stack.pop();
-      printTable(table);
-      level--;
+      //printTable(table);
+      //level--;
    }
 
    public SymbolEntry enterSymbol(String id){
       Map<String, SymbolEntry> table = stack.peek();
       if (table.containsKey(id)){
-         chario.putError("identifier already declared in this block");
+         System.err.println("identifier already declared in this block");
          return EMPTY_SYMBOL;
       }
       else{
-         SymbolEntry s = new SymbolEntry(id, scopeBool, roleBool);
+         SymbolEntry s = new SymbolEntry(id);
          table.put(id, s);
          return s;
       } 
@@ -54,11 +56,11 @@ public class SymbolTable extends Object{
          if (s != null)
              return s;
       }
-      if (roleBool || scopeBool)
-         chario.putError("undeclared identifier");
+      
+      System.err.println("undeclared identifier");
       return EMPTY_SYMBOL;
    }
-         
+    /*     
    private void printTable(Map<String, SymbolEntry> table){
       if (roleBool || scopeBool)
       {
@@ -68,5 +70,6 @@ public class SymbolTable extends Object{
             chario.println(s.toString());
       }
    }
+   */
 
 }

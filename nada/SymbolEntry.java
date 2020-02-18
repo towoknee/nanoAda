@@ -9,20 +9,24 @@ public class SymbolEntry extends Object{
 
    private String name;
    public int role;
-   public SymbolEntry next;
 
+   /*
+   public SymbolEntry next;
    public Boolean scopeBool;
    public Boolean roleBool;
+   */
 
    public SymbolEntry(String id, Boolean s, Boolean r){
       name = id;
       role = NONE;
+      /*
       next = null;
 
       scopeBool = s;
       roleBool = r;
+      */
    }
-
+   /*
    public String toString(){
 
       if (roleBool == true)
@@ -33,19 +37,23 @@ public class SymbolEntry extends Object{
 
       return "";
    }
+   */
 
    public void setRole(int r){
       role = r;
+      /*
       if (next != null)
          next.setRole(r);
+      */
    }
-
+   /*
    public void append(SymbolEntry entry){
       if (next == null)
          next = entry;
       else 
          next.append(entry);
    }  
+   */
 
    private String roleToString(){
       String s = "";
