@@ -10,7 +10,7 @@ import nada.analysis.*;
 import nada.visitors.*;
 import java.io.*;
 import java.util.*;
-public class nada { 
+public class nada {
 	public static void main(String[] arguments) {
 		try {
 			new Parser(new Lexer(new PushbackReader(new BufferedReader(new FileReader(arguments[0])), 1024)))
