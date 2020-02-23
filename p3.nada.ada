@@ -1,1 +1,0 @@
--- hello world--procedure hello isbeginwriteln("Hello, World");end;
