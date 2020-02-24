@@ -15,7 +15,9 @@ public class nada {
 		try {
 			new Parser(new Lexer(new PushbackReader(new BufferedReader(new FileReader(arguments[0])), 1024)))
 			.parse()
-			.apply(new CodeGeneration());
+			.apply(new CodeGeneration(arguments[0]));
+
+				//new CodeGeneration(arguments[0]));
 		}
 		catch(ParserException e) {
 			System.out.println("\nPARSER ERROR: " +e.getMessage());

@@ -1,0 +1,6 @@
+procedure IfTest is
+begin
+  if x = y then
+    writeln("Hello");
+  endif;
+end;
