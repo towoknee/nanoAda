@@ -1,6 +1,7 @@
 -- hello world
 --
 procedure hello is
+a,b,c : constant := 5;
 begin
-	writeln("Hello, World");
+	write("Hello, World");
 end;

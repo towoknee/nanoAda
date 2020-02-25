@@ -67,34 +67,230 @@ public class CodeGeneration extends DepthFirstAdapter
         outStart(node);
     }
 
+
+    @Override
+    public void caseANumberDecl(ANumberDecl node)
+    {
+
+        String s = node.getIdentList().toString().trim(); // a,b,c
+        String[] sArr = s.split(" , "); // [a, b, c]
+
+        for(String i : sArr)
+        {
+            System.out.print("final ");
+            System.out.print("int ");
+            System.out.print(i);
+
+            System.out.print(" = ");
+            node.getSimpleExpr().apply(this);
+            System.out.println(";");
+        }
+
+
+
+        inANumberDecl(node);
+        if(node.getIdentList() != null)
+        {
+            node.getIdentList().apply(this);
+        }
+        if(node.getColon() != null)
+        {
+            node.getColon().apply(this);
+        }
+        if(node.getConst() != null)
+        {
+            node.getConst().apply(this);
+        }
+        if(node.getGets() != null)
+        {
+            node.getGets().apply(this);
+        }
+        if(node.getSimpleExpr() != null)
+        {
+            node.getSimpleExpr().apply(this);
+        }
+        if(node.getSemi() != null)
+        {
+            node.getSemi().apply(this);
+        }
+        outANumberDecl(node);
+    }
+
+    @Override
+    public void caseAIdentList(AIdentList node)
+    {
+        System.out.print(node.getIdent().toString().trim());
+        {
+            List<PAnotherIdent> copy = new ArrayList<PAnotherIdent>(node.getAnotherIdent());
+            for(PAnotherIdent e : copy)
+            {
+                e.apply(this);
+            }
+        }
+    }
+
+  @Override
+    public void caseAAnotherIdent(AAnotherIdent node)
+    {
+        System.out.print(",");
+        System.out.print(node.getIdent().toString().trim());
+    }
+
+    @Override
+    public void caseASubprogramSpec(ASubprogramSpec node)
+    {
+        System.out.print("public static void ");
+        System.out.print(node.getIdent().toString().trim());
+        System.out.print("(");
+        if(node.getFormalPart() != null)
+        {
+            node.getFormalPart().apply(this);
+        }
+        System.out.print(")");
+    }
+
+    @Override
+    public void caseAFormalPart(AFormalPart node)
+    {   
+        node.getParamSpec().apply(this);
+        {
+            List<PAnotherParamSpec> copy = new ArrayList<PAnotherParamSpec>(node.getAnotherParamSpec());
+            for(PAnotherParamSpec e : copy)
+            {
+                e.apply(this);
+            }
+        }  
+    }
+
+    @Override
+    public void caseAParamSpec(AParamSpec node)
+    {
+        String s = node.getIdentList().toString().trim(); // a,b,c
+        String[] sArr = s.split(" , "); // [a, b, c]
+
+        for(String i : sArr)
+        {
+            System.out.print(node.getIdent().toString().trim()); //idk if it gives type
+            System.out.print(" ");
+            System.out.print(i);
+
+            if (i != sArr[sArr.length - 1])
+                System.out.print(", ");
+        }
+    }
+
+    @Override
+    public void caseAAnotherParamSpec(AAnotherParamSpec node)
+    {
+        System.out.print(",");
+        node.getParamSpec().apply(this);
+    }
+
+    @Override
+    public void caseAStmtSeq(AStmtSeq node)
+    {
+
+        node.getStatement().apply(this);
+
+        {
+            List<PStatement> copy = new ArrayList<PStatement>(node.getStatements());
+            for(PStatement e : copy)
+            {
+                e.apply(this);
+            }
+        }
+    }
+
+    @Override
+    public void caseASimpleStmtStatement(ASimpleStmtStatement node)
+    {
+        node.getSimpleStmt().apply(this);
+    }
+
+    @Override
+    public void caseACompoundStmtStatement(ACompoundStmtStatement node)
+    {
+        node.getCompoundStmt().apply(this);
+    }
+
+    @Override
+    public void caseANullStmtSimpleStmt(ANullStmtSimpleStmt node)
+    {
+        node.getNullStmt().apply(this);
+    }
+
+    @Override
+    public void caseAAssignStmtSimpleStmt(AAssignStmtSimpleStmt node)
+    {
+        node.getAssignStmt().apply(this);
+    }
+
+    @Override
+    public void caseAProcCallStmtSimpleStmt(AProcCallStmtSimpleStmt node)
+    {
+        node.getProcCallStmt().apply(this);
+    }
+
+    @Override
+    public void caseAWriteSimpleStmt(AWriteSimpleStmt node)
+    {
+        node.getWriteStmt().apply(this);
+    }
+
+    @Override
+    public void caseAIfCompoundCompoundStmt(AIfCompoundCompoundStmt node)
+    {
+        node.getIfStmt().apply(this);
+    }
+
+    @Override
+    public void caseALoopCompoundCompoundStmt(ALoopCompoundCompoundStmt node)
+    {
+        node.getLoopStmt().apply(this);
+    }
+
+    @Override
+    public void caseANullStmt(ANullStmt node)
+    {
+        System.out.println(";");
+    }
+
+    @Override
+    public void caseAAssignStmt(AAssignStmt node)
+    {
+        System.out.print(node.getIdent().toString().trim()); //apply(this);
+        System.out.print(" = ");
+        node.getSimpleExpr().apply(this);
+        System.out.println(";");
+    }
+
     @Override
     public void caseAWriteWriteStmt(AWriteWriteStmt node)
     {
-        inAWriteWriteStmt(node);
+        //inAWriteWriteStmt(node);
         System.out.print("System.out.print");
         System.out.print("(");
         node.getWriteExpr().apply(this);
         System.out.print(")");
         System.out.print(";");
-        outAWriteWriteStmt(node);
+        //outAWriteWriteStmt(node);
     }
 
 	@Override
     public void caseAWritelnWriteStmt(AWritelnWriteStmt node)
     {
-        inAWritelnWriteStmt(node);
+        //inAWritelnWriteStmt(node);
         System.out.print("System.out.println");
         System.out.print("(");
         node.getWriteExpr().apply(this);
         System.out.print(")");
         System.out.println(";");
-        outAWritelnWriteStmt(node);
+        //outAWritelnWriteStmt(node);
     }
 
     @Override
     public void caseAIfStmt(AIfStmt node)
     {
-        inAIfStmt(node);
 
         System.out.print("if");
         System.out.print("(");
@@ -116,15 +312,95 @@ public class CodeGeneration extends DepthFirstAdapter
 
         if(node.getElseClause() != null)
         {
-            System.out.print("else");
-            System.out.print("{");
-            node.getElseClause().toString().trim();
-            System.out.print("}");
+            node.getElseClause().apply(this);
         }
+    }
 
+    @Override
+    public void caseAElseifClause(AElseifClause node)
+    {
+        System.out.print("else if");
+        System.out.print("(");
+        node.getRelation().apply(this);
+        System.out.println("){");
+        node.getStmtSeq().apply(this);
+        System.out.println("");
+        System.out.println("}");
+        
+    }
 
+    @Override
+    public void caseAElseClause(AElseClause node)
+    {
+        System.out.println("else{");
+        node.getStmtSeq().apply(this);
+        System.out.println("");
+        System.out.println("}");
+    }
 
-        outAIfStmt(node);
+    @Override
+    public void caseALoopStmt(ALoopStmt node)
+    {
+        System.out.print("while");
+        System.out.print("(");
+        node.getRelation().apply(this);
+        System.out.print(")");
+        System.out.println("{");
+        node.getStmtSeq().apply(this);
+        System.out.println("");
+        System.out.println("}");
+    }
+
+    @Override
+    public void caseAProcCallStmt(AProcCallStmt node)
+    {
+        System.out.print(node.getIdent().toString().trim());// apply(this);
+        if(node.getActualParamPart() != null)
+        {
+            node.getActualParamPart().apply(this);
+        }
+        System.out.print(";");
+    }
+
+    @Override
+    public void caseAActualParamPart(AActualParamPart node)
+    {
+
+        System.out.print("(");
+        node.getSimpleExpr().apply(this);
+        
+        {
+            List<PAnotherParam> copy = new ArrayList<PAnotherParam>(node.getAnotherParam());
+            for(PAnotherParam e : copy)
+            {
+                e.apply(this);
+            }
+        }
+        System.out.print(")");
+    }
+
+    @Override
+    public void caseAAnotherParam(AAnotherParam node)
+    {
+        System.out.print(",");
+        node.getSimpleExpr().apply(this);
+    }
+
+    @Override
+    public void caseARelation(ARelation node)
+    {
+        node.getSimpleExpr().apply(this);
+
+        if(node.getRelationClause() != null)
+            node.getRelationClause().apply(this);
+        
+    }
+
+    @Override
+    public void caseARelationClause(ARelationClause node)
+    {
+        node.getRelOp().apply(this);
+        node.getSimpleExpr().apply(this);
     }
 
     @Override
