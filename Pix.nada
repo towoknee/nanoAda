@@ -1,0 +1,32 @@
+procedure Pi(X : INTEGER) is 
+  I, J : INTEGER;
+  COUNTER : INTEGER; 
+  MODRESULT : INTEGER;
+  
+  begin
+
+  I := 1;
+  while I <= X loop 
+    COUNTER := 0;
+    J := 1; 
+    while J <= I loop 
+      MODRESULT := I mod J;
+      if MODRESULT = 0 then
+        COUNTER := COUNTER + 1;
+      endif;
+      J := J + 1; 
+    end loop; 
+
+    if I = X then 
+      if COUNTER = 2 then
+        write("X");
+      endif;
+    endif;
+    
+    if COUNTER = 2 then
+      write("I,");
+    endif;
+    
+    I := I + 1;
+  end loop;
+end; 
