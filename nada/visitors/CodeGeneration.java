@@ -10,7 +10,10 @@ import nada.analysis.*;
 public class CodeGeneration extends DepthFirstAdapter
 {
     String pName;
-    static String getFile;
+    String getFile;
+    String className; 
+    String funcName;
+    FileWriter myWriter;
 
     public CodeGeneration(String progName) 
     {
@@ -30,9 +33,12 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseStart(Start node)
     {
-        inStart(node);
+        funcName = "";
+
         // Creating a file
         String javaFileName = pName.replace("nada", "java"); 
+        className = javaFileName.replace(".java", "");
+
         try
         {
             getFile = "./nada/" + javaFileName;
@@ -51,10 +57,10 @@ public class CodeGeneration extends DepthFirstAdapter
         // Writing to file
         try 
         {
-          FileWriter myWriter = new FileWriter(getFile);
-          myWriter.write("Files in Java might be tricky, but it is fun enough!\n");
-          myWriter.write("Did it append?");
-          System.out.println("Testing Write");
+          myWriter = new FileWriter(getFile);
+          node.getPNada().apply(this);
+          node.getEOF().apply(this);
+
           myWriter.close();
           System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
@@ -62,91 +68,191 @@ public class CodeGeneration extends DepthFirstAdapter
           e.printStackTrace();
         }
 
-        node.getPNada().apply(this);
-        node.getEOF().apply(this);
-        outStart(node);
-    }
-
-
-    @Override
-    public void caseANumberDecl(ANumberDecl node)
-    {
-
-        String s = node.getIdentList().toString().trim(); // a,b,c
-        String[] sArr = s.split(" , "); // [a, b, c]
-
-        for(String i : sArr)
-        {
-            System.out.print("final ");
-            System.out.print("int ");
-            System.out.print(i);
-
-            System.out.print(" = ");
-            node.getSimpleExpr().apply(this);
-            System.out.println(";");
-        }
-
-
-
-        inANumberDecl(node);
-        if(node.getIdentList() != null)
-        {
-            node.getIdentList().apply(this);
-        }
-        if(node.getColon() != null)
-        {
-            node.getColon().apply(this);
-        }
-        if(node.getConst() != null)
-        {
-            node.getConst().apply(this);
-        }
-        if(node.getGets() != null)
-        {
-            node.getGets().apply(this);
-        }
-        if(node.getSimpleExpr() != null)
-        {
-            node.getSimpleExpr().apply(this);
-        }
-        if(node.getSemi() != null)
-        {
-            node.getSemi().apply(this);
-        }
-        outANumberDecl(node);
     }
 
     @Override
-    public void caseAIdentList(AIdentList node)
+    public void caseANada(ANada node) 
     {
-        System.out.print(node.getIdent().toString().trim());
+        try
         {
-            List<PAnotherIdent> copy = new ArrayList<PAnotherIdent>(node.getAnotherIdent());
-            for(PAnotherIdent e : copy)
+            myWriter.write("public class " + className + "{\n");
+            node.getSubprogramBody().apply(this);
+
+            myWriter.write("public static void main(String[] args){\n");
+            
+            String[] str = funcName.split(" "); // [a, b, c]
+
+            for(String i : str)
+            {
+               myWriter.write(funcName.trim() + "();\n");
+            }
+            myWriter.write("}\n");  
+            myWriter.write("}\n");  
+
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void caseASubprogramBody(ASubprogramBody node)
+    {
+        try
+        {
+            node.getSubprogramSpec().apply(this);
+            myWriter.write("{\n");
+            node.getDeclPart().apply(this);
+            node.getStmtSeq().apply(this);
+            myWriter.write("}\n");
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void caseADeclPart(ADeclPart node)
+    {
+        {
+            List<PBasicDecl> copy = new ArrayList<PBasicDecl>(node.getBasicDecl());
+            for(PBasicDecl e : copy)
             {
                 e.apply(this);
             }
         }
     }
 
+    @Override
+    public void caseAObjDeclBasicDecl(AObjDeclBasicDecl node)
+    {
+        node.getObjectDecl().apply(this);
+    }
+
+    @Override
+    public void caseANumDeclBasicDecl(ANumDeclBasicDecl node)
+    {
+        node.getNumberDecl().apply(this);
+    }
+
+    @Override
+    public void caseASpbDeclBasicDecl(ASpbDeclBasicDecl node)
+    {
+        node.getSubprogramBody().apply(this);
+    }
+
+    @Override
+    public void caseAObjectDecl(AObjectDecl node)
+    {
+        try
+        {
+            String s = node.getIdentList().toString().trim(); // a,b,c
+            String[] sArr = s.split(" , "); // [a, b, c]
+
+            for(String i : sArr)
+            {
+                myWriter.write(node.getIdent().toString().trim());
+                myWriter.write(" " + i);
+                myWriter.write(" = ");
+
+                myWriter.write("new ");
+                myWriter.write(node.getIdent().toString().trim());
+                myWriter.write("();\n");
+            }
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void caseANumberDecl(ANumberDecl node)
+    {
+        try
+        {
+            String s = node.getIdentList().toString().trim(); // a,b,c
+            String[] sArr = s.split(" , "); // [a, b, c]
+
+            for(String i : sArr)
+            {
+                myWriter.write("final ");
+                myWriter.write("int ");
+                myWriter.write(i);
+
+                myWriter.write(" = ");
+                node.getSimpleExpr().apply(this);
+                myWriter.write(";\n");
+            }
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void caseAIdentList(AIdentList node)
+    {
+        try
+        {
+            myWriter.write(node.getIdent().toString().trim());
+            {
+                List<PAnotherIdent> copy = new ArrayList<PAnotherIdent>(node.getAnotherIdent());
+                for(PAnotherIdent e : copy)
+                {
+                    e.apply(this);
+                }
+            }
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
   @Override
     public void caseAAnotherIdent(AAnotherIdent node)
     {
-        System.out.print(",");
-        System.out.print(node.getIdent().toString().trim());
+        try
+        {
+            myWriter.write(",");
+            myWriter.write(node.getIdent().toString().trim());
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseASubprogramSpec(ASubprogramSpec node)
     {
-        System.out.print("public static void ");
-        System.out.print(node.getIdent().toString().trim());
-        System.out.print("(");
-        if(node.getFormalPart() != null)
+        try
         {
-            node.getFormalPart().apply(this);
+            myWriter.write("public static void ");
+            funcName = funcName.concat(node.getIdent().toString().trim() + " ");
+            myWriter.write(node.getIdent().toString().trim());
+            myWriter.write("(");
+            if(node.getFormalPart() != null)
+            {
+                node.getFormalPart().apply(this);
+            }
+            myWriter.write(")");
         }
-        System.out.print(")");
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -165,25 +271,41 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseAParamSpec(AParamSpec node)
     {
-        String s = node.getIdentList().toString().trim(); // a,b,c
-        String[] sArr = s.split(" , "); // [a, b, c]
-
-        for(String i : sArr)
+        try
         {
-            System.out.print(node.getIdent().toString().trim()); //idk if it gives type
-            System.out.print(" ");
-            System.out.print(i);
+            String s = node.getIdentList().toString().trim(); // a,b,c
+            String[] sArr = s.split(" , "); // [a, b, c]
 
-            if (i != sArr[sArr.length - 1])
-                System.out.print(", ");
+            for(String i : sArr)
+            {
+                myWriter.write(node.getIdent().toString().trim()); //idk if it gives type
+                myWriter.write(" ");
+                myWriter.write(i);
+
+                if (i != sArr[sArr.length - 1])
+                    myWriter.write(", ");
+            }
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 
     @Override
     public void caseAAnotherParamSpec(AAnotherParamSpec node)
     {
-        System.out.print(",");
-        node.getParamSpec().apply(this);
+        try
+        {
+            myWriter.write(",");
+            node.getParamSpec().apply(this);
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -252,27 +374,51 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseANullStmt(ANullStmt node)
     {
-        System.out.println(";");
+        try
+        {
+            myWriter.write(";\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAAssignStmt(AAssignStmt node)
     {
-        System.out.print(node.getIdent().toString().trim()); //apply(this);
-        System.out.print(" = ");
-        node.getSimpleExpr().apply(this);
-        System.out.println(";");
+        try
+        {
+            myWriter.write(node.getIdent().toString().trim()); //apply(this);
+            myWriter.write(" = ");
+            node.getSimpleExpr().apply(this);
+            myWriter.write(";\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAWriteWriteStmt(AWriteWriteStmt node)
     {
         //inAWriteWriteStmt(node);
-        System.out.print("System.out.print");
-        System.out.print("(");
-        node.getWriteExpr().apply(this);
-        System.out.print(")");
-        System.out.print(";");
+        try
+        {
+            myWriter.write("System.out.print");
+            myWriter.write("(");
+            node.getWriteExpr().apply(this);
+            myWriter.write(")");
+            myWriter.write(";");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
         //outAWriteWriteStmt(node);
     }
 
@@ -280,110 +426,173 @@ public class CodeGeneration extends DepthFirstAdapter
     public void caseAWritelnWriteStmt(AWritelnWriteStmt node)
     {
         //inAWritelnWriteStmt(node);
-        System.out.print("System.out.println");
-        System.out.print("(");
-        node.getWriteExpr().apply(this);
-        System.out.print(")");
-        System.out.println(";");
+        try
+        {
+            myWriter.write("System.out.println");
+            myWriter.write("(");
+            node.getWriteExpr().apply(this);
+            myWriter.write(")");
+            myWriter.write(";\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
         //outAWritelnWriteStmt(node);
     }
 
     @Override
     public void caseAIfStmt(AIfStmt node)
     {
-
-        System.out.print("if");
-        System.out.print("(");
-        node.getRelation().apply(this); // toString().trim();  /// not sure
-        System.out.print(")");
-        System.out.println("{");
-
-        node.getStmtSeq().apply(this); // toString().trim(); // not sure
-        
-        System.out.println("}");
-
+        try
         {
-            List<PElseifClause> copy = new ArrayList<PElseifClause>(node.getElseifClause());
-            for(PElseifClause e : copy)
+            myWriter.write("if");
+            myWriter.write("(");
+            node.getRelation().apply(this); // toString().trim();  /// not sure
+            myWriter.write(")");
+            myWriter.write("{\n");
+
+            node.getStmtSeq().apply(this); // toString().trim(); // not sure
+            
+            myWriter.write("}\n");
+
             {
-                e.apply(this);
+                List<PElseifClause> copy = new ArrayList<PElseifClause>(node.getElseifClause());
+                for(PElseifClause e : copy)
+                {
+                    e.apply(this);
+                }
+            }
+
+            if(node.getElseClause() != null)
+            {
+                node.getElseClause().apply(this);
             }
         }
 
-        if(node.getElseClause() != null)
+        catch (IOException e) 
         {
-            node.getElseClause().apply(this);
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 
     @Override
     public void caseAElseifClause(AElseifClause node)
     {
-        System.out.print("else if");
-        System.out.print("(");
-        node.getRelation().apply(this);
-        System.out.println("){");
-        node.getStmtSeq().apply(this);
-        System.out.println("");
-        System.out.println("}");
+        try
+        {
+            myWriter.write("else if");
+            myWriter.write("(");
+            node.getRelation().apply(this);
+            myWriter.write("){\n");
+            node.getStmtSeq().apply(this);
+            myWriter.write("\n");
+            myWriter.write("}\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
         
     }
 
     @Override
     public void caseAElseClause(AElseClause node)
     {
-        System.out.println("else{");
-        node.getStmtSeq().apply(this);
-        System.out.println("");
-        System.out.println("}");
+        try
+        {
+            myWriter.write("else{\n");
+            node.getStmtSeq().apply(this);
+            myWriter.write("\n");
+            myWriter.write("}\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseALoopStmt(ALoopStmt node)
     {
-        System.out.print("while");
-        System.out.print("(");
-        node.getRelation().apply(this);
-        System.out.print(")");
-        System.out.println("{");
-        node.getStmtSeq().apply(this);
-        System.out.println("");
-        System.out.println("}");
+        try
+        {
+            myWriter.write("while");
+            myWriter.write("(");
+            node.getRelation().apply(this);
+            myWriter.write(")");
+            myWriter.write("{\n");
+            node.getStmtSeq().apply(this);
+            //myWriter.write("\n");
+            myWriter.write("}\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAProcCallStmt(AProcCallStmt node)
     {
-        System.out.print(node.getIdent().toString().trim());// apply(this);
-        if(node.getActualParamPart() != null)
+        try
         {
-            node.getActualParamPart().apply(this);
+            myWriter.write(node.getIdent().toString().trim());// apply(this);
+            if(node.getActualParamPart() != null)
+            {
+                node.getActualParamPart().apply(this);
+            }
+            myWriter.write(";");
         }
-        System.out.print(";");
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAActualParamPart(AActualParamPart node)
     {
-
-        System.out.print("(");
-        node.getSimpleExpr().apply(this);
-        
+        try
         {
-            List<PAnotherParam> copy = new ArrayList<PAnotherParam>(node.getAnotherParam());
-            for(PAnotherParam e : copy)
+            myWriter.write("(");
+            node.getSimpleExpr().apply(this);
+            
             {
-                e.apply(this);
+                List<PAnotherParam> copy = new ArrayList<PAnotherParam>(node.getAnotherParam());
+                for(PAnotherParam e : copy)
+                {
+                    e.apply(this);
+                }
             }
+            myWriter.write(")");
         }
-        System.out.print(")");
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAAnotherParam(AAnotherParam node)
     {
-        System.out.print(",");
-        node.getSimpleExpr().apply(this);
+        try
+        {
+            myWriter.write(",");
+            node.getSimpleExpr().apply(this);
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -406,13 +615,29 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseAStringLitWriteExpr(AStringLitWriteExpr node)
     {
-        System.out.print(node.getStringLit().toString().trim());
+        try
+        {
+            myWriter.write(node.getStringLit().toString().trim());
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseASimpleExprWriteExpr(ASimpleExprWriteExpr node)
     {
-        System.out.print(node.getSimpleExpr().toString().trim());
+        try
+        {
+            myWriter.write(node.getSimpleExpr().toString().trim());
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
 
@@ -468,96 +693,216 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseANegPrimFactor(ANegPrimFactor node)
     {
-        System.out.print("-");
-        node.getPrimary().apply(this);
+        try
+        {
+            myWriter.write("-");
+        
+            node.getPrimary().apply(this);
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseANumLitPrimary(ANumLitPrimary node)
     {
-
-        System.out.print(node.getNumberLit().toString().trim());//apply(this);
+        try
+        {
+            myWriter.write(node.getNumberLit().toString().trim());//apply(this);
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseANamePrimary(ANamePrimary node)
     {
-        System.out.print(node.getIdent().toString().trim());//apply(this); // not sure
+        try
+        {
+            myWriter.write(node.getIdent().toString().trim());//apply(this); // not sure
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void caseAExprPrimary(AExprPrimary node)
     {
-        System.out.print("(");
-        node.getSimpleExpr().apply(this);
-        System.out.print(")");
+        try
+        {
+            myWriter.write("(");
+            node.getSimpleExpr().apply(this);
+            myWriter.write(")");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAEqRelOp(AEqRelOp node)
     {
-        System.out.print("==");
+        try
+        {
+            myWriter.write("==");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseANeqRelOp(ANeqRelOp node)
     {
-        System.out.print("!=");
+        try
+        {
+            myWriter.write("!=");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseALtRelOp(ALtRelOp node)
     {
-        System.out.print("<");
+        try
+        {
+            myWriter.write("<");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseALeRelOp(ALeRelOp node)
     {
-        System.out.print("<=");
+        try
+        {
+            myWriter.write("<=");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAGtRelOp(AGtRelOp node)
     {
-        System.out.print(">");
+        try
+        {
+            myWriter.write(">");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
     
     @Override
     public void caseAGeRelOp(AGeRelOp node)
     {
-        System.out.print(">=");
+        try
+        {
+            myWriter.write(">=");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAPlusAddOp(APlusAddOp node)
     {
-        System.out.print("+");
+        try
+        {
+            myWriter.write("+");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAMinusAddOp(AMinusAddOp node)
     {
-        System.out.print("-");
+        try
+        {
+            myWriter.write("-");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAMultMulOp(AMultMulOp node)
     {
-        System.out.print("*");
+        try
+        {
+            myWriter.write("*");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseADivMulOp(ADivMulOp node)
     {
-        System.out.print("/");
+        try
+        {
+            myWriter.write("/");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void caseAModMulOp(AModMulOp node)
     {
-        System.out.print("%");
+        try
+        {
+            myWriter.write("%");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 	
 }

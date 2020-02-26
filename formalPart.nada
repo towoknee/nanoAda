@@ -1,0 +1,9 @@
+procedure formalPart(X,A,B : INTEGER; C : CHAR) is 
+
+L,M,N : BOOLEAN;
+begin 
+  if X = 1 then
+    writeln("i is 1");
+  endif; 
+end;
+

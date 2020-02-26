@@ -1,7 +1,7 @@
 -- hello world
 --
 procedure hello is
-a,b,c : constant := 5;
 begin
-	write("Hello, World");
+	writeln("Hello, World");
+  writeln("Hello again!");
 end;

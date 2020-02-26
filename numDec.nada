@@ -1,0 +1,14 @@
+procedure numDec is 
+
+I : INTEGER;
+
+begin 
+
+I := 1;
+
+while I < 10 loop
+  writeln("Hello!");
+  I := I + 1; 
+end loop;
+
+end; 

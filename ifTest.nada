@@ -1,6 +1,6 @@
 procedure IfTest is
 begin
-  if x = y then
+  if 1 = 0 then
     writeln("Hello");
   endif;
 end;

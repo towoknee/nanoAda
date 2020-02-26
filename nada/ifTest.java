@@ -1,2 +1,10 @@
-Files in Java might be tricky, but it is fun enough!
-Did it append?
+public class ifTest{
+public static void IfTest(){
+if(1==0){
+System.out.println("Hello");
+}
+}
+public static void main(String[] args){
+IfTest();
+}
+}
