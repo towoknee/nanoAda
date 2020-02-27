@@ -2,7 +2,7 @@ procedure ONE (A : INTEGER ; B : out INTEGER) is
 
     procedure TWO (C : out INTEGER ; D : INTEGER) is
 
-        procedure THREE (E : out INTEGER ; F : out INTEGER) is
+        procedure THREE (E : out INTEGER) is
 
             begin
             null;

@@ -15,6 +15,8 @@ import nada.analysis.*;
 public class SemanticAnalyzer extends DepthFirstAdapter
 {
 	private SymbolTable table;
+	private int numOut;
+	private Stack<String> procStack;  
 
 	private void initTable(){
 		 table = new SymbolTable();
@@ -57,6 +59,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 	{
 		inStart(node);
 		initTable();
+		procStack = new Stack<String>();
 		node.getPNada().apply(this);
 		node.getEOF().apply(this);
 		outStart(node);
@@ -92,10 +95,18 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 			node.getEnd().apply(this);
 		}
 		table.exitScope();
+
+		String poppedProc = procStack.pop();
+
 		if(node.getIdent() != null)
 		{
 			SymbolEntry entry = findId(node.getIdent().toString().trim());
 			acceptRole(entry, SymbolEntry.PROC, "must be a PROC identifier"); // *****
+			if (poppedProc.trim().compareTo(node.getIdent().toString().trim()) != 0)
+			{
+				System.err.println("Wrong end PROCxx");
+				System.exit(0);
+			}
 			node.getIdent().apply(this);
 		}
 		if(node.getSemi() != null)
@@ -182,6 +193,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		{
 			SymbolEntry entry = enterId(node.getIdent().toString().trim());
 			entry.setRole(SymbolEntry.PROC);
+			procStack.push(node.getIdent().toString().trim());
 			node.getIdent().apply(this);
 		}
 		table.enterScope();
@@ -191,6 +203,40 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		outASubprogramSpec(node);
 	}
+
+	@Override
+    public void caseAFormalPart(AFormalPart node)
+    {
+        inAFormalPart(node);
+        if(node.getLParen() != null)
+        {
+            node.getLParen().apply(this);
+        }
+        if(node.getParamSpec() != null)
+        {
+            node.getParamSpec().apply(this);
+        }
+        {
+            List<PAnotherParamSpec> copy = new ArrayList<PAnotherParamSpec>(node.getAnotherParamSpec());
+            for(PAnotherParamSpec e : copy)
+            {
+                e.apply(this);
+            }
+        }
+
+        if (numOut > 1)
+        {
+        	System.err.println("Too many OUT'S");
+        	System.exit(0);
+        }
+
+        numOut = 0; // multiple procedures can have out's
+        if(node.getRParen() != null)
+        {
+            node.getRParen().apply(this);
+        }
+        outAFormalPart(node);
+    }
 
 	@Override
 	public void caseAParamSpec(AParamSpec node)
@@ -207,6 +253,16 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		if(node.getOut() != null)
 		{
 			node.getOut().apply(this);
+			numOut++;
+
+			// check for multiple out variables
+			String s = node.getIdentList().toString().trim(); // a,b,c
+            String[] sArr = s.split(" , "); // [a, b, c]
+            if (sArr.length > 1)
+            {
+            	System.err.println("Too many OUT'S");
+        		System.exit(0);
+            }
 		}
 		if(node.getIdent() != null)
 		{
@@ -216,6 +272,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		outAParamSpec(node);
 	}
+
 
 	@Override
 	public void caseAAssignStmt(AAssignStmt node)

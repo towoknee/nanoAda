@@ -1,0 +1,4 @@
+procedure FOO(X,Y,Z : out INTEGER) is
+begin
+null;
+end;
