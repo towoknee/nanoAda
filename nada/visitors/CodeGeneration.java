@@ -1,7 +1,3 @@
-//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''‘’
-//
-//
-
 package nada.visitors;
 import java.util.*;
 import java.io.*;
@@ -12,8 +8,12 @@ public class CodeGeneration extends DepthFirstAdapter
     String pName;
     String getFile;
     String className; 
-    String funcName;
     FileWriter myWriter;
+    int whichProc;
+    int outCounter; 
+    String outReturn; 
+    int whiteSpaceCounter;
+    String whiteSpace; 
 
     public CodeGeneration(String progName) 
     {
@@ -29,14 +29,27 @@ public class CodeGeneration extends DepthFirstAdapter
 		System.err.println("OUT:" + node.getClass().getSimpleName() + ":" + node);
 	}
 
+    public String indent()
+    {
+        whiteSpace = "";
+        for (int i = 0; i < whiteSpaceCounter; i++)
+        {
+            whiteSpace = whiteSpace + "\t";
+        }
+        return whiteSpace;
+    }
+
 
     @Override
     public void caseStart(Start node)
     {
-        funcName = "";
+        whichProc = 0;
+        outCounter = 0;
+        whiteSpaceCounter = 0;
+        whiteSpace = "";
 
         // Creating a file
-        String javaFileName = pName.replace("nada", "java"); 
+        String javaFileName = pName.replace("ada", "java"); 
         className = javaFileName.replace(".java", "");
 
         try
@@ -73,28 +86,7 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseANada(ANada node) 
     {
-        try
-        {
-            myWriter.write("public class " + className + "{\n");
-            node.getSubprogramBody().apply(this);
-
-            myWriter.write("public static void main(String[] args){\n");
-            
-            String[] str = funcName.split(" "); // [a, b, c]
-
-            for(String i : str)
-            {
-               myWriter.write(funcName.trim() + "();\n");
-            }
-            myWriter.write("}\n");  
-            myWriter.write("}\n");  
-
-        } 
-        catch (IOException e) 
-        {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
+            node.getSubprogramBody().apply(this);   
     }
 
     @Override
@@ -104,9 +96,34 @@ public class CodeGeneration extends DepthFirstAdapter
         {
             node.getSubprogramSpec().apply(this);
             myWriter.write("{\n");
-            node.getDeclPart().apply(this);
-            node.getStmtSeq().apply(this);
-            myWriter.write("}\n");
+            whiteSpaceCounter++;
+            node.getDeclPart().apply(this); 
+
+            if(whichProc == 1)
+            {
+                myWriter.write(indent() + "public static void main(String[] args){\n");
+                whiteSpaceCounter++;
+                node.getStmtSeq().apply(this);
+                whiteSpaceCounter--;
+                myWriter.write(indent() + "}\n");
+                whiteSpaceCounter--;
+                myWriter.write(indent() + "}\n");
+                
+            }
+            else
+            {
+                node.getStmtSeq().apply(this);
+                if (outCounter == 1)
+                {
+                    myWriter.write(indent() + "return " + outReturn + ";\n");
+                    outCounter--;
+                }
+                whiteSpaceCounter--;
+                myWriter.write(indent() + "}\n");
+                whichProc -= 1;
+
+            }
+
         } 
         catch (IOException e) 
         {
@@ -155,23 +172,12 @@ public class CodeGeneration extends DepthFirstAdapter
 
             for(String i : sArr)
             {
-                if (node.getIdent().toString().trim().compareTo("INTEGER") == 0)
-                {
-                    myWriter.write("int");
-                    myWriter.write(" " + i);
-
-                    myWriter.write(";\n");
-                }
-                else 
-                {
-                    myWriter.write(node.getIdent().toString().trim());
-                    myWriter.write(" " + i);
-                    myWriter.write(" = ");
-
-                    myWriter.write("new ");
-                    myWriter.write(node.getIdent().toString().trim());
-                    myWriter.write("();\n");
-                }
+                myWriter.write(indent());
+                if(whichProc == 1)
+                    myWriter.write("static ");
+                myWriter.write("int");
+                myWriter.write(" " + i);
+                myWriter.write(";\n");
             }
         }
         catch (IOException e) 
@@ -191,6 +197,9 @@ public class CodeGeneration extends DepthFirstAdapter
 
             for(String i : sArr)
             {
+                myWriter.write(indent());
+                if(whichProc == 1)
+                    myWriter.write("static ");
                 myWriter.write("final ");
                 myWriter.write("int ");
                 myWriter.write(i);
@@ -247,16 +256,26 @@ public class CodeGeneration extends DepthFirstAdapter
     public void caseASubprogramSpec(ASubprogramSpec node)
     {
         try
-        {
-            myWriter.write("public static void ");
-            funcName = funcName.concat(node.getIdent().toString().trim() + " ");
-            myWriter.write(node.getIdent().toString().trim());
-            myWriter.write("(");
-            if(node.getFormalPart() != null)
+        {   whichProc += 1; // For functions
+            if (whichProc > 1)
             {
-                node.getFormalPart().apply(this);
+                if (node.getFormalPart().toString().trim().contains("out"))
+                    myWriter.write(indent() + "public static int " + node.getIdent().toString().trim());
+                else
+                    myWriter.write(indent() + "public static void " + node.getIdent().toString().trim());
+                myWriter.write("(");
+                if(node.getFormalPart() != null)
+                {
+                    node.getFormalPart().apply(this);
+                }
+                myWriter.write(")");
+
             }
-            myWriter.write(")");
+            else //For main class
+            {
+                myWriter.write("public class ");
+                myWriter.write(node.getIdent().toString().trim());
+            }
         }
         catch (IOException e) 
         {
@@ -285,28 +304,22 @@ public class CodeGeneration extends DepthFirstAdapter
         {
             String s = node.getIdentList().toString().trim(); // a,b,c
             String[] sArr = s.split(" , "); // [a, b, c]
+            
+            if(node.getOut() != null)
+            {
+                outCounter++;
+                outReturn = s;  
+            }
 
             for(String i : sArr)
             {
-                if (node.getIdent().toString().trim().compareTo("INTEGER") == 0)
-                {
-                    myWriter.write("int");
-                    myWriter.write(" " + i);
-                    
-                    if (i != sArr[sArr.length - 1])
-                        myWriter.write(", ");
-                }
-
-                else
-                {
-                    myWriter.write(node.getIdent().toString().trim()); //idk if it gives type
-                    myWriter.write(" ");
-                    myWriter.write(i);
-
-                    if (i != sArr[sArr.length - 1])
-                        myWriter.write(", ");
-                }
+                myWriter.write("int");
+                myWriter.write(" " + i);
+                
+                if (i != sArr[sArr.length - 1])
+                    myWriter.write(", ");
             }
+
         }
         catch (IOException e) 
         {
@@ -412,7 +425,7 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write(node.getIdent().toString().trim()); //apply(this);
+            myWriter.write(indent() + node.getIdent().toString().trim()); 
             myWriter.write(" = ");
             node.getSimpleExpr().apply(this);
             myWriter.write(";\n");
@@ -427,30 +440,9 @@ public class CodeGeneration extends DepthFirstAdapter
     @Override
     public void caseAWriteWriteStmt(AWriteWriteStmt node)
     {
-        //inAWriteWriteStmt(node);
         try
         {
-            myWriter.write("System.out.print");
-            myWriter.write("(");
-            node.getWriteExpr().apply(this);
-            myWriter.write(")");
-            myWriter.write(";");
-        }
-        catch (IOException e) 
-        {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-        //outAWriteWriteStmt(node);
-    }
-
-	@Override
-    public void caseAWritelnWriteStmt(AWritelnWriteStmt node)
-    {
-        //inAWritelnWriteStmt(node);
-        try
-        {
-            myWriter.write("System.out.println");
+            myWriter.write(indent() + "System.out.print");
             myWriter.write("(");
             node.getWriteExpr().apply(this);
             myWriter.write(")");
@@ -461,7 +453,24 @@ public class CodeGeneration extends DepthFirstAdapter
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-        //outAWritelnWriteStmt(node);
+    }
+
+	@Override
+    public void caseAWritelnWriteStmt(AWritelnWriteStmt node)
+    {
+        try
+        {
+            myWriter.write(indent() + "System.out.println");
+            myWriter.write("(");
+            node.getWriteExpr().apply(this);
+            myWriter.write(")");
+            myWriter.write(";\n");
+        }
+        catch (IOException e) 
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -469,15 +478,17 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write("if");
+            myWriter.write(indent() + "if");
             myWriter.write("(");
-            node.getRelation().apply(this); // toString().trim();  /// not sure
+            node.getRelation().apply(this); 
             myWriter.write(")");
             myWriter.write("{\n");
+            whiteSpaceCounter++;
 
-            node.getStmtSeq().apply(this); // toString().trim(); // not sure
+            node.getStmtSeq().apply(this); 
             
-            myWriter.write("}\n");
+            whiteSpaceCounter--;
+            myWriter.write(indent() + "}\n");
 
             {
                 List<PElseifClause> copy = new ArrayList<PElseifClause>(node.getElseifClause());
@@ -505,13 +516,14 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write("else if");
+            myWriter.write(indent() + "else if");
             myWriter.write("(");
             node.getRelation().apply(this);
             myWriter.write("){\n");
+            whiteSpaceCounter++;
             node.getStmtSeq().apply(this);
-            myWriter.write("\n");
-            myWriter.write("}\n");
+            whiteSpaceCounter--;
+            myWriter.write(indent() + "}\n");
         }
         catch (IOException e) 
         {
@@ -526,10 +538,11 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write("else{\n");
+            myWriter.write(indent() + "else{\n");
+            whiteSpaceCounter++;
             node.getStmtSeq().apply(this);
-            myWriter.write("\n");
-            myWriter.write("}\n");
+            whiteSpaceCounter--;
+            myWriter.write(indent() + "}\n");
         }
         catch (IOException e) 
         {
@@ -543,14 +556,15 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write("while");
+            myWriter.write(indent() + "while");
             myWriter.write("(");
             node.getRelation().apply(this);
             myWriter.write(")");
             myWriter.write("{\n");
+            whiteSpaceCounter++;
             node.getStmtSeq().apply(this);
-            //myWriter.write("\n");
-            myWriter.write("}\n");
+            whiteSpaceCounter--;
+            myWriter.write(indent() + "}\n");
         }
         catch (IOException e) 
         {
@@ -564,12 +578,12 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write(node.getIdent().toString().trim());// apply(this);
+            myWriter.write(indent() + node.getIdent().toString().trim());
             if(node.getActualParamPart() != null)
             {
                 node.getActualParamPart().apply(this);
             }
-            myWriter.write(";");
+            myWriter.write(";\n");
         }
         catch (IOException e) 
         {
@@ -662,8 +676,6 @@ public class CodeGeneration extends DepthFirstAdapter
         }
     }
 
-
-    // consider the use of left and right 
     @Override
     public void caseASimpleExpr(ASimpleExpr node)
     {
@@ -685,7 +697,6 @@ public class CodeGeneration extends DepthFirstAdapter
         node.getTerm().apply(this);
     }
 
-    // consider the use of left and right?? 
     @Override
     public void caseATerm(ATerm node)
     {
@@ -733,7 +744,7 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write(node.getNumberLit().toString().trim());//apply(this);
+            myWriter.write(node.getNumberLit().toString().trim());
         }
         catch (IOException e) 
         {
@@ -747,7 +758,7 @@ public class CodeGeneration extends DepthFirstAdapter
     {
         try
         {
-            myWriter.write(node.getIdent().toString().trim());//apply(this); // not sure
+            myWriter.write(node.getIdent().toString().trim());
         }
         catch (IOException e) 
         {

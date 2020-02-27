@@ -2,9 +2,9 @@
 //
 // Parses the a nada file and prints parse tree details
 //
-// Created on Feb 6 , 2020
+// Created on Feb 27 , 2020 3:27 AM
 //
-// Copyright 2020 Daryl Posnett All rights reserved
+// Copyright 2020 Tony Doan and Harry Bassi All rights reserved
 //
 package nada.visitors;
 import nada.*;

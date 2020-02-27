@@ -1,6 +1,0 @@
-procedure TEST is
-    A , B : INTEGER;
-    begin
-    B := 10;
-    B := INTEGER + 5;
-    end;

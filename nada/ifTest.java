@@ -1,10 +1,7 @@
-public class ifTest{
-public static void IfTest(){
-if(1==0){
+public class IfTest{
+public static void main(String[] args){
+if(1==1){
 System.out.println("Hello");
 }
-}
-public static void main(String[] args){
-IfTest();
 }
 }

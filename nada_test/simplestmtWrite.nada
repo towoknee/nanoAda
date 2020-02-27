@@ -1,4 +1,0 @@
-procedure TEST is
-    begin
-    writeln("Hello, World");
-    end;    

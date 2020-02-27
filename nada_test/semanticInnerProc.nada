@@ -1,8 +1,0 @@
-procedure TEST is
-  procedure TEST2 is
-    begin
-    null;
-    end TEST;
-begin
-null;
-end TEST;

@@ -1,0 +1,14 @@
+procedure Foo is 
+  r: INTEGER;
+  procedure Bar(X : out INTEGER) is
+  begin
+    X := 2;
+  end Bar;
+  procedure Hello(Y : INTEGER) is
+  begin
+  null;
+  end; 
+begin
+  Bar(r);
+  writeln(r);
+end Foo; 

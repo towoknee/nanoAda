@@ -1,11 +1,12 @@
+procedure Pix is 
 procedure Pi(X : INTEGER) is 
   I, J : INTEGER;
   COUNTER : INTEGER; 
   MODRESULT : INTEGER;
-  
   begin
 
   I := 1;
+
   while I <= X loop 
     COUNTER := 0;
     J := 1; 
@@ -17,16 +18,20 @@ procedure Pi(X : INTEGER) is
       J := J + 1; 
     end loop; 
 
-    if I = X then 
-      if COUNTER = 2 then
-        write("X");
-      endif;
-    endif;
-    
     if COUNTER = 2 then
-      write("I,");
+      if I = 2 then
+        write("2");
+      else
+        write(",");
+        write(I);
+      endif;
     endif;
     
     I := I + 1;
   end loop;
+
+  end;
+
+begin
+Pi(100);
 end; 

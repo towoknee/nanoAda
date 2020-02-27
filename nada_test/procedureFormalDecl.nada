@@ -1,5 +1,0 @@
-procedure TEST (num1 : INTEGER) is
-    num2 : INTEGER;
-    begin
-    null;    
-    end;    

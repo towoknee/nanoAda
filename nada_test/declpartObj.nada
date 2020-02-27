@@ -1,6 +1,0 @@
-procedure TEST is
-    A : INTEGER;
-    B, C: INTEGER;
-    begin
-    null;
-    end;

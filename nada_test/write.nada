@@ -1,4 +1,0 @@
-procedure TEST is
-begin
-    write("Hello, World");
-end;
