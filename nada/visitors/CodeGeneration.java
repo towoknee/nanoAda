@@ -155,13 +155,23 @@ public class CodeGeneration extends DepthFirstAdapter
 
             for(String i : sArr)
             {
-                myWriter.write(node.getIdent().toString().trim());
-                myWriter.write(" " + i);
-                myWriter.write(" = ");
+                if (node.getIdent().toString().trim().compareTo("INTEGER") == 0)
+                {
+                    myWriter.write("int");
+                    myWriter.write(" " + i);
 
-                myWriter.write("new ");
-                myWriter.write(node.getIdent().toString().trim());
-                myWriter.write("();\n");
+                    myWriter.write(";\n");
+                }
+                else 
+                {
+                    myWriter.write(node.getIdent().toString().trim());
+                    myWriter.write(" " + i);
+                    myWriter.write(" = ");
+
+                    myWriter.write("new ");
+                    myWriter.write(node.getIdent().toString().trim());
+                    myWriter.write("();\n");
+                }
             }
         }
         catch (IOException e) 
@@ -278,12 +288,24 @@ public class CodeGeneration extends DepthFirstAdapter
 
             for(String i : sArr)
             {
-                myWriter.write(node.getIdent().toString().trim()); //idk if it gives type
-                myWriter.write(" ");
-                myWriter.write(i);
+                if (node.getIdent().toString().trim().compareTo("INTEGER") == 0)
+                {
+                    myWriter.write("int");
+                    myWriter.write(" " + i);
+                    
+                    if (i != sArr[sArr.length - 1])
+                        myWriter.write(", ");
+                }
 
-                if (i != sArr[sArr.length - 1])
-                    myWriter.write(", ");
+                else
+                {
+                    myWriter.write(node.getIdent().toString().trim()); //idk if it gives type
+                    myWriter.write(" ");
+                    myWriter.write(i);
+
+                    if (i != sArr[sArr.length - 1])
+                        myWriter.write(", ");
+                }
             }
         }
         catch (IOException e) 

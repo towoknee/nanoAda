@@ -11,7 +11,7 @@ public class SymbolTable extends Object{
    */
    private static final SymbolEntry EMPTY_SYMBOL = new SymbolEntry("");
 
-   public SymbolTable(Chario c, Boolean s, Boolean r){
+   public SymbolTable(){
       /*
       chario = c;
       scopeBool = s;
