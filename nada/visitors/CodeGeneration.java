@@ -22,11 +22,11 @@ public class CodeGeneration extends DepthFirstAdapter
 
 	public void defaultIn(Node node)
 	{
-		System.err.println("IN:" + node.getClass().getSimpleName() + ":" + node);
+		//System.err.println("IN:" + node.getClass().getSimpleName() + ":" + node);
 	}
 	public void defaultOut(Node node)
 	{
-		System.err.println("OUT:" + node.getClass().getSimpleName() + ":" + node);
+		//System.err.println("OUT:" + node.getClass().getSimpleName() + ":" + node);
 	}
 
     public String indent()
@@ -49,8 +49,12 @@ public class CodeGeneration extends DepthFirstAdapter
         whiteSpace = "";
 
         // Creating a file
-        String javaFileName = pName.replace("ada", "java"); 
+        //System.out.println("pName: " + pName);
+        String javaFileName = pName.replace("nada", ""); 
+        javaFileName = javaFileName.replace(".ada", ".java");
+        //System.out.println("java File Name: " + javaFileName);
         className = javaFileName.replace(".java", "");
+        className = className.replace("/", "");
 
         try
         {
@@ -274,7 +278,8 @@ public class CodeGeneration extends DepthFirstAdapter
             else //For main class
             {
                 myWriter.write("public class ");
-                myWriter.write(node.getIdent().toString().trim());
+                myWriter.write(className);
+                //myWriter.write(node.getIdent().toString().trim());
             }
         }
         catch (IOException e) 

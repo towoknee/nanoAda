@@ -1,14 +1,15 @@
-pprocedure PRIMES is 
+procedure PRIMES is 
 	I, J : INTEGER;
 	COUNTER : INTEGER;
 	MODRESULT : INTEGER;
 	begin 
-	I := 1;
+	write("\r");
+  I := 1;
 	while I <= 100 loop
 		COUNTER := 0;
 		J := 1;
 		while J <= I loop
-			MODRESULT := I % J; 
+			MODRESULT := I mod J; 
 			if MODRESULT = 0 then
 				COUNTER := COUNTER + 1;
 			endif;
@@ -23,4 +24,5 @@ pprocedure PRIMES is
 		endif;
 		I := I + 1;
 	end loop;
+  write("\r");
 end; 

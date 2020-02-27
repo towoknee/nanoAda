@@ -3,7 +3,8 @@ procedure PRIMES is
 	COUNTER : INTEGER;
 	MODRESULT : INTEGER;
 	begin 
-	I := 1;
+	write("\r");
+  I := 1;
 	while I <= 100 loop
 		COUNTER := 0;
 		J := 1;
@@ -23,4 +24,5 @@ procedure PRIMES is
 		endif;
 		I := I + 1;
 	end loop;
+  write("\r");
 end; 

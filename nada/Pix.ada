@@ -33,5 +33,7 @@ procedure Pi(X : INTEGER) is
   end;
 
 begin
+write("\r");
 Pi(100);
+write("\r");
 end; 

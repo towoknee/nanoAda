@@ -1,9 +1,0 @@
-procedure formalPart(X,A,B : INTEGER; C : INTEGER) is 
-
-L,M,N : INTEGER;
-begin 
-  if X = 1 then
-    writeln("i is 1");
-  endif; 
-end;
-

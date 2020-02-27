@@ -48,11 +48,11 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 
 	public void defaultIn(Node node)
 	{
-		System.err.println("IN:" + node.getClass().getSimpleName() + ":" + node);
+		//System.err.println("IN:" + node.getClass().getSimpleName() + ":" + node);
 	}
 	public void defaultOut(Node node)
 	{
-		System.err.println("OUT:" + node.getClass().getSimpleName() + ":" + node);
+		//System.err.println("OUT:" + node.getClass().getSimpleName() + ":" + node);
 	}
 	@Override
 	public void caseStart(Start node)

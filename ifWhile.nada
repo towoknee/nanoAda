@@ -1,8 +1,0 @@
-procedure ifWhile is
-begin
-  while 1 < 10 loop
-    if 5 = 5 then
-      writeln("YAY");
-    endif;
-  end loop;
-end;
