@@ -1,0 +1,4 @@
+procedure TEST (number : INTEGER) is
+    begin
+    null;
+    end;

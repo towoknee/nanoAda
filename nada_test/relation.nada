@@ -1,0 +1,57 @@
+
+procedure TEST is
+
+    X : INTEGER;
+
+    begin
+        X := 5;
+
+        if X < 5 then 
+            null;
+        endif;
+
+        if X + 5 < 5 then
+            null;
+        endif;
+
+        if X > 5 then 
+            null;
+        endif;
+
+        if X + 5 > 5 then
+            null;
+        endif;
+
+        if X <= 5 then 
+            null;
+        endif;
+
+        if X + 5 <= 5 then
+            null;
+        endif;
+
+        if X >= 5 then 
+            null;
+        endif;
+
+        if X + 5 >= 5 then
+            null;
+        endif;
+
+         if X = 5 then 
+            null;
+        endif;
+
+        if X + 5 = 5 then
+            null;
+        endif;
+
+        if X /= 5 then 
+            null;
+        endif;
+
+        if X + 5 /= 5 then
+            null;
+        endif;
+
+    end;

@@ -1,0 +1,20 @@
+procedure ONE (A : INTEGER ; B : out INTEGER) is
+
+    procedure TWO (C : out INTEGER ; D : INTEGER) is
+
+        procedure THREE (E : out INTEGER ; F : out INTEGER) is
+
+            begin
+            null;
+            end;
+
+        begin
+        null;
+        end;  
+
+    begin
+    null;
+    end;
+
+
+ 

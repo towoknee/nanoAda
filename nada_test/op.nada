@@ -1,0 +1,14 @@
+
+procedure TEST is
+
+    X : INTEGER;
+
+    begin
+        X := 5;
+        
+        X := X - 5;
+        X := X + 5;
+        X := X * 5;
+        X := X / 5;
+        X := X mod 5;
+    end;

@@ -1,0 +1,7 @@
+procedure TEST is
+    A : constant := 5;
+    B : constant := 5 + 10;
+    C : constant := B + 15;
+    begin
+    null;
+    end;

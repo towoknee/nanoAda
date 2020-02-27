@@ -1,0 +1,5 @@
+procedure TEST (num1 : INTEGER) is
+    num2 : INTEGER;
+    begin
+    writeln("Hello, World");    
+    end TEST;

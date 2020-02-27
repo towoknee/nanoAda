@@ -1,0 +1,40 @@
+procedure PrimesX (X : INTEGER) is
+    i, j : INTEGER;
+    prev_bool, prime_bool : INTEGER;
+    begin
+        write("\r");
+        i := 3;
+        -- checks if X > 1
+        if X > 1 then
+            write("2");
+            -- loop through every number from 3 to X + 1
+            while i < X + 1
+                loop
+                j := 2;
+                prime_bool := 1;
+                prev_bool := 0;
+                -- check if i is a prime
+                while j < i
+                    loop
+                    if prev_bool = 0 then
+                        if i mod j = 0 then
+                            prev_bool := 1;
+                            prime_bool := 0;
+                        endif;
+                    endif;
+                    j := j + 1;
+                    end loop;
+                -- if i is a prime, write to stdout
+                if prime_bool = 1 then
+                    write(", ");
+                    write(i);
+                endif;
+                i := i + 1;
+                end loop;
+            write("\r");
+        -- if X <= 1, then return
+        else
+            write("\r\r");
+        endif;
+    end;
+

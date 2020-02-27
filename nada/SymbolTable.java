@@ -1,3 +1,4 @@
+package nada; 
 import java.util.*;
 
 public class SymbolTable extends Object{
@@ -12,34 +13,26 @@ public class SymbolTable extends Object{
    private static final SymbolEntry EMPTY_SYMBOL = new SymbolEntry("");
 
    public SymbolTable(){
-      /*
-      chario = c;
-      scopeBool = s;
-      roleBool = r;
-      */
       reset();
    }
 
    public void reset(){
-      //level = -1;
       stack = new Stack<Map<String, SymbolEntry>>();
    }
 
    public void enterScope(){
       stack.push(new HashMap<String, SymbolEntry>());
-      //level++;
    }
 
    public void exitScope(){
       Map<String, SymbolEntry> table = stack.pop();
-      //printTable(table);
-      //level--;
    }
 
    public SymbolEntry enterSymbol(String id){
       Map<String, SymbolEntry> table = stack.peek();
       if (table.containsKey(id)){
-         System.err.println("identifier already declared in this block");
+         System.err.println("identifier already declared in this block HUHHH?");
+         System.exit(0);
          return EMPTY_SYMBOL;
       }
       else{
@@ -58,18 +51,8 @@ public class SymbolTable extends Object{
       }
       
       System.err.println("undeclared identifier");
+      System.exit(0);
       return EMPTY_SYMBOL;
    }
-    /*     
-   private void printTable(Map<String, SymbolEntry> table){
-      if (roleBool || scopeBool)
-      {
-         chario.println("\nLevel " + level);
-         chario.println("---------");
-         for (SymbolEntry s : table.values())
-            chario.println(s.toString());
-      }
-   }
-   */
 
 }

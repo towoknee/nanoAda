@@ -7,35 +7,38 @@
 // Copyright 2020 Daryl Posnett All rights reserved
 //
 package nada.visitors;
+import nada.*;
 import java.util.*;
 import java.io.*;
 import nada.node.*;
 import nada.analysis.*;
 public class SemanticAnalyzer extends DepthFirstAdapter
 {
+	private SymbolTable table;
 
 	private void initTable(){
 		 table = new SymbolTable();
 		 table.enterScope();
-		 entry = table.enterSymbol("INTEGER");
+		 SymbolEntry entry = table.enterSymbol("INTEGER");
 		 entry.setRole(SymbolEntry.TYPE);
 	}
 
 
-	private void acceptRole(SymbolEntry s, int expected){
+	private void acceptRole(SymbolEntry s, int expected, String e){
 		 if (s.role != SymbolEntry.NONE && s.role != expected)
 		 {
-				System.out.println("ERROR CAME FROM ACCEPT");
+			System.out.println(e);
+			System.exit(0);
 		 }
 	}
 
-	private SymbolEntry enterId(x){
+	private SymbolEntry enterId(String x){
 		 SymbolEntry entry = null;
 		 entry = table.enterSymbol(x);
 		 return entry;
 	}
 
-	private SymbolEntry findId(x){
+	private SymbolEntry findId(String x){
 		 SymbolEntry entry = null;
 		 entry = table.findSymbol(x);
 		 return entry;
@@ -91,7 +94,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		table.exitScope();
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
 			acceptRole(entry, SymbolEntry.PROC, "must be a PROC identifier"); // *****
 			node.getIdent().apply(this);
 		}
@@ -116,8 +119,8 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
-    	entry.acceptRole(entry, SymbolEntry.TYPE, "Must be a TYPE identifier");
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
+    		acceptRole(entry, SymbolEntry.TYPE, "Must be a TYPE identifier");
 			node.getIdent().apply(this);
 		}
 		if(node.getSemi() != null)
@@ -133,7 +136,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		inAIdentList(node);
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = enterId(node.getIdent().apply(this));
+			SymbolEntry entry = enterId(node.getIdent().toString().trim());
 			entry.setRole(SymbolEntry.VAR);
 			node.getIdent().apply(this);
 		}
@@ -141,8 +144,6 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 			List<PAnotherIdent> copy = new ArrayList<PAnotherIdent>(node.getAnotherIdent());
 			for(PAnotherIdent e : copy)
 			{
-				SymbolEntry entry = enterId(e.apply(this));
-				entry.setRole(SymbolEntry.VAR);
 				e.apply(this);
 			}
 		}
@@ -159,7 +160,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = enterId(node.getIdent().apply(this));
+			SymbolEntry entry = enterId(node.getIdent().toString().trim());
 			entry.setRole(SymbolEntry.VAR);
 			node.getIdent().apply(this);
 		}
@@ -179,7 +180,7 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = enterId(node.getIdent().apply(this));
+			SymbolEntry entry = enterId(node.getIdent().toString().trim());
 			entry.setRole(SymbolEntry.PROC);
 			node.getIdent().apply(this);
 		}
@@ -209,8 +210,8 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		}
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
-			entry.acceptRole(entry, SymbolEntry.TYPE, "Must be a TYPE identifier");
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
+			acceptRole(entry, SymbolEntry.TYPE, "Must be a TYPE identifier");
 			node.getIdent().apply(this);
 		}
 		outAParamSpec(node);
@@ -222,8 +223,8 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		inAAssignStmt(node);
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
-			entry.acceptRole(entry, SymbolEntry.VAR, "Must be a VAR identifier");
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
+			acceptRole(entry, SymbolEntry.VAR, "Must be a VAR identifier");
 			node.getIdent().apply(this);
 		}
 		if(node.getGets() != null)
@@ -247,8 +248,8 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		inAProcCallStmt(node);
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
-			entry.acceptRole(entry, SymbolEntry.TYPE, "Must be a TYPE identifier");
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
+			acceptRole(entry, SymbolEntry.PROC, "Must be a PROC identifier");
 			node.getIdent().apply(this);
 		}
 		if(node.getActualParamPart() != null)
@@ -268,8 +269,8 @@ public class SemanticAnalyzer extends DepthFirstAdapter
 		inANamePrimary(node);
 		if(node.getIdent() != null)
 		{
-			SymbolEntry entry = findId(node.getIdent().apply(this));
-			entry.acceptRole(entry, SymbolEntry.VAR, "Must be a VAR identifier");
+			SymbolEntry entry = findId(node.getIdent().toString().trim());
+			acceptRole(entry, SymbolEntry.VAR, "Must be a VAR identifier");
 			node.getIdent().apply(this);
 		}
 		outANamePrimary(node);

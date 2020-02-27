@@ -1,0 +1,13 @@
+procedure TEST is
+
+    procedure CALL is
+        begin
+        null;
+        end CALL;   
+
+    begin
+    CALL;
+    end;
+
+
+ 

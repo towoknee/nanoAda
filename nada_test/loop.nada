@@ -1,0 +1,12 @@
+
+procedure TEST is
+
+    X : INTEGER;
+
+    begin
+        X := 5;
+        while X < 5
+            loop
+            null;
+            end loop;
+    end;

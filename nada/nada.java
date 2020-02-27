@@ -13,9 +13,10 @@ import java.util.*;
 public class nada {
 	public static void main(String[] arguments) {
 		try {
-			new Parser(new Lexer(new PushbackReader(new BufferedReader(new FileReader(arguments[0])), 1024)))
-			.parse()
-			.apply(new CodeGeneration(arguments[0]));
+			Parser parser = new Parser(new Lexer(new PushbackReader(new BufferedReader(new FileReader(arguments[0])), 1024)));
+			Start ast = parser.parse();
+			ast.apply(new SemanticAnalyzer());
+			ast.apply(new CodeGeneration(arguments[0]));
 
 				//new CodeGeneration(arguments[0]));
 		}

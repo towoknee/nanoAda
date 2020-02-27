@@ -1,0 +1,13 @@
+
+procedure TEST is
+
+    X : INTEGER;
+
+    begin
+        X := 5;
+        if X < 5 then
+            null;
+        else
+            null;
+        endif;
+    end;

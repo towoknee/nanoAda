@@ -1,0 +1,11 @@
+procedure TEST is
+    A , B : INTEGER;
+
+    procedure TEST2(C : INTEGER) is
+        begin
+        null;
+        end;
+
+    begin
+    INTEGER(A);
+    end;
